@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"html/template" // New import
+
 	// New import
 	"net/http"
 	"strconv"
@@ -51,4 +52,14 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write([]byte("Create a new snippet..."))
+
+	// Pass the data to the SnippetModel.Insert() method, receiving the
+	// ID of the new record back.
+	id, err := app.snippets.Insert(title, content, expires)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/snippet?id=%d", id), http.StatusSeeOther)
 }
