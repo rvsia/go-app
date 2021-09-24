@@ -21,11 +21,6 @@ func main() {
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
 	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	app := &application{
-		errorLog: errorLog,
-		infoLog:  infoLog,
-	}
-
 	addr := flag.String("addr", ":4000", "HTTP network address")
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL dat")
 	flag.Parse()
@@ -35,6 +30,12 @@ func main() {
 		errorLog.Fatal(err)
 	}
 	defer db.Close()
+
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+		snippets: &mysql.SnippetModel{DB: db},
+	}
 
 	infoLog.Printf("Starting server on %s", *addr)
 	srv := &http.Server{
